@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --background: #E9E4D8;
+  --surface: #F4EFE4;
+  --sidebar: #E3DDCF;
+  --foreground: #1E1E1E;
+  --primary-action: #2E2E2E;
+  --muted: #5E5A52;
+  --border: #D2CBBB;
+  --secondary-surface: #D8D2C4;
+  --accent-surface: #E6E4D7;
+  --signal: #F26A4B;
+}
+
+.dark {
+  --background: #1A1916;
+  --surface: #24221E;
+  --sidebar: #1E1D1A;
+  --foreground: #E9E4D8;
+  --primary-action: #F4EFE4;
+  --muted: #A8A395;
+  --border: #3A3833;
+  --secondary-surface: #2D2B26;
+  --accent-surface: #292723;
+  --signal: #F26A4B;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-primary-action: var(--primary-action);
+  --color-muted-text: var(--muted);
+  --color-border-custom: var(--border);
+  --color-secondary-surface: var(--secondary-surface);
+  --color-accent-surface: var(--accent-surface);
+  --color-signal: var(--signal);
+  
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-serif: var(--font-playfair-display), serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom scrollbars that match the editorial aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
