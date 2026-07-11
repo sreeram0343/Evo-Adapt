@@ -41,25 +41,26 @@ class AgentController:
 
         # 1. Retrieve Experience lessons
         self.state = AgentState.RETRIEVING_EXPERIENCE
-        experiences = retrieve_relevant_experiences(
-            db=self.db,
-            description=task.description,
-            constraints=task.constraints or [],
-            tags=task.tags or []
-        )
-        
         retrieved_lessons = ""
         retrieved_ids = []
-        if experiences:
-            retrieved_ids = [exp.experience_id for exp in experiences]
-            lessons_list = []
-            for idx, exp in enumerate(experiences):
-                lessons_list.append(
-                    f"Lesson {idx+1}:\n"
-                    f"- Trigger: {exp.trigger}\n"
-                    f"- Principle: {exp.principle}"
-                )
-            retrieved_lessons = "\n\n".join(lessons_list)
+        
+        if mode == "recode":
+            experiences = retrieve_relevant_experiences(
+                db=self.db,
+                description=task.description,
+                constraints=task.constraints or [],
+                tags=task.tags or []
+            )
+            if experiences:
+                retrieved_ids = [exp.experience_id for exp in experiences]
+                lessons_list = []
+                for idx, exp in enumerate(experiences):
+                    lessons_list.append(
+                        f"Lesson {idx+1}:\n"
+                        f"- Trigger: {exp.trigger}\n"
+                        f"- Principle: {exp.principle}"
+                    )
+                retrieved_lessons = "\n\n".join(lessons_list)
 
         # 2. Build Context
         self.state = AgentState.BUILDING_CONTEXT
