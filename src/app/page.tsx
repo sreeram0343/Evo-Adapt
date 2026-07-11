@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TopNav } from '@/components/navigation/top-nav';
 import { TaskPanel } from '@/components/task/task-panel';
 import { CodeWorkspace } from '@/components/workspace/code-workspace';
@@ -11,10 +11,12 @@ import { BenchmarkView } from '@/components/shared/benchmark-view';
 import { mockTasks } from '@/lib/mock-data';
 import { useAgentRun } from '@/hooks/use-agent-run';
 import { Task } from '@/lib/types';
+import { ApiClient } from '@/lib/api-client';
 
 export default function Home() {
   const [activeNavTab, setActiveNavTab] = useState<string>('workspace');
-  const [selectedTask, setSelectedTask] = useState<Task>(mockTasks[0]);
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(mockTasks[0]);
   const [maxAttempts, setMaxAttempts] = useState<number>(3);
   
   // Mobile sub-tab selector
@@ -29,8 +31,33 @@ export default function Home() {
     runAgent,
     events,
     status,
-    metrics
+    metrics,
+    apiMode,
+    setApiMode
   } = useAgentRun();
+
+  // Dynamically load tasks on mount or when API Mode is toggled
+  useEffect(() => {
+    async function loadTasks() {
+      if (apiMode) {
+        try {
+          const apiTasks = await ApiClient.listTasks();
+          if (apiTasks && apiTasks.length > 0) {
+            setTasks(apiTasks);
+            setSelectedTask(apiTasks[0]);
+          }
+        } catch (e) {
+          console.error("Failed to load tasks from API, falling back to mocks:", e);
+          setTasks(mockTasks);
+          setSelectedTask(mockTasks[0]);
+        }
+      } else {
+        setTasks(mockTasks);
+        setSelectedTask(mockTasks[0]);
+      }
+    }
+    loadTasks();
+  }, [apiMode]);
 
   const handleSelectTask = (task: Task) => {
     setSelectedTask(task);
@@ -47,6 +74,8 @@ export default function Home() {
         activeTab={activeNavTab}
         setActiveTab={setActiveNavTab}
         onNewExperiment={handleNewExperiment}
+        apiMode={apiMode}
+        onToggleApiMode={setApiMode}
       />
 
       {/* Main Container */}
@@ -79,12 +108,12 @@ export default function Home() {
               {/* Task Panel (22%) */}
               <div className={`${mobileTab === 'task' ? 'flex' : 'hidden'} lg:flex lg:w-[22%] shrink-0 min-h-0`}>
                 <TaskPanel
-                  tasks={mockTasks}
-                  selectedTask={selectedTask}
+                  tasks={tasks}
+                  selectedTask={selectedTask || mockTasks[0]}
                   onSelectTask={handleSelectTask}
                   maxAttempts={maxAttempts}
                   onChangeMaxAttempts={setMaxAttempts}
-                  onRunAgent={runAgent}
+                  onRunAgent={() => selectedTask && runAgent(selectedTask.id, maxAttempts)}
                   isRunning={isRunning}
                 />
               </div>

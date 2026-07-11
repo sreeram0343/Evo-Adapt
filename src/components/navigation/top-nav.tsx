@@ -8,9 +8,11 @@ interface TopNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onNewExperiment?: () => void;
+  apiMode?: boolean;
+  onToggleApiMode?: (val: boolean) => void;
 }
 
-export function TopNav({ activeTab, setActiveTab, onNewExperiment }: TopNavProps) {
+export function TopNav({ activeTab, setActiveTab, onNewExperiment, apiMode, onToggleApiMode }: TopNavProps) {
   return (
     <header className="h-12 border-b border-border-custom bg-surface px-4 flex items-center justify-between select-none">
       {/* Left: Branding */}
@@ -46,6 +48,21 @@ export function TopNav({ activeTab, setActiveTab, onNewExperiment }: TopNavProps
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {onToggleApiMode && (
+          <button
+            onClick={() => onToggleApiMode(!apiMode)}
+            type="button"
+            className={`h-7 px-2.5 flex items-center gap-1.5 font-sans text-[10px] font-bold tracking-wider uppercase border rounded transition-all cursor-pointer select-none focus:outline-none ${
+              apiMode
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
+                : 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${apiMode ? 'bg-emerald-500' : 'bg-amber-500'} ${apiMode ? 'animate-pulse' : ''}`} />
+            <span>{apiMode ? 'API Mode' : 'Simulated'}</span>
+          </button>
+        )}
+
         <ThemeToggle />
         
         <a
