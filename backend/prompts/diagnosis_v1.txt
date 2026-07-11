@@ -1,0 +1,26 @@
+You are a software testing critic.
+Review the following Python code and its unit test failures.
+
+Function Signature:
+{signature}
+
+Description:
+{description}
+
+BUGGY CODE:
+{code}
+
+Test execution log output:
+{test_logs}
+
+Analyze this failure. First, identify the root cause of the bug. Second, design a repair strategy to resolve it.
+Format your output as a single JSON object matching this structure:
+{{
+  "category": "logic_error",
+  "affected_test": "test_case_name",
+  "root_cause_summary": "Concise summary of the bug",
+  "repair_strategy": "Concise description of the fix",
+  "confidence": 0.95
+}}
+Note: "category" must be one of "logic_error", "syntax_error", "runtime_error", "assertion_error", "timeout", "resource_limit", "unknown_error".
+Return ONLY the raw JSON object. Do not wrap in markdown backticks or explanations.

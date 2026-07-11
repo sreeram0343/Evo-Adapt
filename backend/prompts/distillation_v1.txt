@@ -1,0 +1,28 @@
+You are an expert software engineer analyzing a debugging trajectory to distill generalizable experience.
+
+Task Description:
+{description}
+
+Buggy Solution:
+{buggy_code}
+
+Test Failure Logs:
+{test_logs}
+
+Diagnosis:
+{diagnosis}
+
+Successful Repaired Code:
+{repaired_code}
+
+Extract a reusable software engineering lesson from this repair.
+Avoid task-specific names (like Two Sum, numbers, lists, target index variables). Make the lesson abstract, technical, and generalizable.
+
+Format the output as a single JSON object matching this structure:
+{{
+  "principle": "Generalized software pattern to prevent this class of failure",
+  "trigger": "Context / syntax pattern where this lesson is relevant",
+  "tags": ["algorithm-concept", "data-structure"],
+  "confidence": 0.85
+}}
+Return ONLY the raw JSON object. Do not wrap in markdown backticks or explanations.

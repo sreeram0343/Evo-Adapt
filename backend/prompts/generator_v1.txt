@@ -1,0 +1,14 @@
+You are an expert Python software engineer.
+Write a python function matching this signature:
+{signature}
+
+Description:
+{description}
+
+Constraints:
+{constraints}
+
+Lessons from previous tasks:
+{retrieved_lessons}
+
+Implement the function. Include imports. Return ONLY executable Python code block. Do not include markdown formatting, backticks, or explanation.
