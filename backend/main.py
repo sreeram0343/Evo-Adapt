@@ -24,6 +24,73 @@ from backend.llm.provider import MockProvider, OpenAIProvider, GeminiProvider
 # Auto-create SQLite database tables on startup
 Base.metadata.create_all(bind=engine)
 
+def seed_database():
+    from backend.storage.database import SessionLocal
+    db = SessionLocal()
+    try:
+        if len(TaskRepository.list_tasks(db)) == 0:
+            print("Seeding tasks database...")
+            tasks_to_seed = [
+                {
+                    "task_id": "two-sum",
+                    "title": "Two Sum",
+                    "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+                    "constraints": ["Time complexity: O(N)"],
+                    "function_signature": "def two_sum(nums: List[int], target: int) -> List[int]:",
+                    "tests": [
+                        {"id": "01", "input": "[2,7,11,15], 9", "expected": "[0,1]"},
+                        {"id": "02", "input": "[3,2,4], 6", "expected": "[1,2]"},
+                        {"id": "03", "input": "[3,3], 6", "expected": "[0,1]"},
+                        {"id": "04", "input": "[1,5,3,7,8], 10", "expected": "[2,3]"},
+                        {"id": "05", "input": "[0,4,3,0], 0", "expected": "[0,3]"}
+                    ],
+                    "tags": ["array", "hashmap"],
+                    "difficulty": "Easy",
+                    "max_attempts": 3
+                },
+                {
+                    "task_id": "valid-parentheses",
+                    "title": "Valid Parentheses",
+                    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.",
+                    "constraints": ["Check ordering constraints"],
+                    "function_signature": "def is_valid(s: str) -> bool:",
+                    "tests": [
+                        {"id": "01", "input": '\"()\"', "expected": "True"},
+                        {"id": "02", "input": '\"()[]{}\"', "expected": "True"},
+                        {"id": "03", "input": '\"(]\"', "expected": "False"},
+                        {"id": "04", "input": '\"([)]\"', "expected": "False"},
+                        {"id": "05", "input": '\"{[]}\"', "expected": "True"}
+                    ],
+                    "tags": ["string", "stack"],
+                    "difficulty": "Easy",
+                    "max_attempts": 3
+                },
+                {
+                    "task_id": "reverse-linked-list",
+                    "title": "Reverse Linked List",
+                    "description": "Given the head of a singly linked list, reverse the list, and return the reversed list.",
+                    "constraints": ["Pointer swap constraints"],
+                    "function_signature": "def reverse_list(head: Optional[ListNode]) -> Optional[ListNode]:",
+                    "tests": [
+                        {"id": "01", "input": "[1,2,3,4,5]", "expected": "[5,4,3,2,1]"},
+                        {"id": "02", "input": "[1,2]", "expected": "[2,1]"},
+                        {"id": "03", "input": "[]", "expected": "[]"}
+                    ],
+                    "tags": ["linked-list"],
+                    "difficulty": "Easy",
+                    "max_attempts": 3
+                }
+            ]
+            for task_data in tasks_to_seed:
+                TaskRepository.create_task(db, task_data)
+            print("Database tasks seeded successfully.")
+    except Exception as e:
+        print(f"Error seeding database: {e}")
+    finally:
+        db.close()
+
+seed_database()
+
 app = FastAPI(
     title="ReCode API",
     description="Backend API for ReCode Experience-Guided Code Repair Agent",
