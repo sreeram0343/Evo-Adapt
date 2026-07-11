@@ -41,6 +41,27 @@ class MockProvider(LLMProvider):
                     "            return [i, nums.index(complement)]\n"
                     "    return []"
                 )
+            elif "contains_nearby_duplicate" in user_prompt:
+                if "Lesson 1" in user_prompt or "Validate state" in user_prompt or "Principle" in user_prompt:
+                    content = (
+                        "def contains_nearby_duplicate(nums: List[int], k: int) -> bool:\n"
+                        "    seen = {}\n"
+                        "    for i, num in enumerate(nums):\n"
+                        "        if num in seen and i - seen[num] <= k:\n"
+                        "            return True\n"
+                        "        seen[num] = i\n"
+                        "    return False"
+                    )
+                else:
+                    content = (
+                        "def contains_nearby_duplicate(nums: List[int], k: int) -> bool:\n"
+                        "    seen = {}\n"
+                        "    for i, num in enumerate(nums):\n"
+                        "        seen[num] = i\n"
+                        "        if num in seen:\n"
+                        "            return True\n"
+                        "    return False"
+                    )
             else:
                 content = "def solution():\n    pass"
 
