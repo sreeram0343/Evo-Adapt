@@ -54,7 +54,16 @@ class MockProvider(LLMProvider):
                 "confidence": 0.95
             })
 
-        # 3. Check if this is a repair request
+        # 3. Check if this is a distillation request
+        elif "distill" in user_prompt.lower() or "generalizable" in user_prompt.lower():
+            content = json.dumps({
+                "principle": "When mutable lookup state represents only previously processed elements, validate against the existing state before inserting the current element.",
+                "trigger": "Sequential algorithm using mutable lookup state",
+                "tags": ["hashmap", "state-ordering"],
+                "confidence": 0.85
+            })
+
+        # 4. Check if this is a repair request
         elif "buggy" in user_prompt.lower() or "repair" in user_prompt.lower() or "Strategy" in user_prompt:
             if "two_sum" in user_prompt or "seen" in user_prompt or "repaired" in user_prompt or "complement" in user_prompt:
                 content = (
@@ -69,15 +78,6 @@ class MockProvider(LLMProvider):
                 )
             else:
                 content = "def solution():\n    # repaired\n    pass"
-
-        # 4. Check if this is a distillation request
-        elif "distill" in user_prompt.lower() or "generalizable" in user_prompt.lower():
-            content = json.dumps({
-                "principle": "When mutable lookup state represents only previously processed elements, validate against the existing state before inserting the current element.",
-                "trigger": "Sequential algorithm using mutable lookup state",
-                "tags": ["hashmap", "state-ordering"],
-                "confidence": 0.85
-            })
         else:
             content = "Mock response content."
 

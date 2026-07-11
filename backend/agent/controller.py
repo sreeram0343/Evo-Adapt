@@ -10,6 +10,9 @@ from backend.llm.base import LLMProvider
 from backend.executor.runner import run_execution
 from backend.storage.repositories import TaskRepository, ExperimentRepository
 from backend.storage.models import ExperimentModel
+from backend.experience.retriever import retrieve_relevant_experiences
+from backend.agent.experience_distiller import distill_experience
+from backend.experience.repository import LessonRepository
 
 PROMPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "prompts")
 
@@ -36,10 +39,27 @@ class AgentController:
         if not task:
             raise ValueError(f"Task with ID {task_id} not found")
 
-        # 1. Retrieve Experience lessons (Milestone 6 logic placeholder)
+        # 1. Retrieve Experience lessons
         self.state = AgentState.RETRIEVING_EXPERIENCE
+        experiences = retrieve_relevant_experiences(
+            db=self.db,
+            description=task.description,
+            constraints=task.constraints or [],
+            tags=task.tags or []
+        )
+        
         retrieved_lessons = ""
         retrieved_ids = []
+        if experiences:
+            retrieved_ids = [exp.experience_id for exp in experiences]
+            lessons_list = []
+            for idx, exp in enumerate(experiences):
+                lessons_list.append(
+                    f"Lesson {idx+1}:\n"
+                    f"- Trigger: {exp.trigger}\n"
+                    f"- Principle: {exp.principle}"
+                )
+            retrieved_lessons = "\n\n".join(lessons_list)
 
         # 2. Build Context
         self.state = AgentState.BUILDING_CONTEXT
@@ -140,8 +160,32 @@ class AgentController:
                 db_exp.final_status = "passed"
                 ExperimentRepository.add_attempt(self.db, attempt_data)
                 
-                # 5a. Experience distillation (Milestone 6 logic placeholder)
-                self.state = AgentState.DISTILLING_EXPERIENCE
+                # 5a. Experience distillation (only if in recode mode and loop actually did a repair)
+                if mode == "recode" and attempt_number > 1:
+                    self.state = AgentState.DISTILLING_EXPERIENCE
+                    # Get details of original failure (Attempt 1)
+                    attempt_1 = db_exp.attempts[0] if len(db_exp.attempts) > 0 else None
+                    
+                    if attempt_1:
+                        failed_code = attempt_1.generated_code
+                        failed_logs = json.dumps(attempt_1.execution_result.get("failed_tests", []))
+                        diagnosis = attempt_1.repair_summary or "Assertion failed during unit test run."
+                        
+                        lesson_data = distill_experience(
+                            provider=self.provider,
+                            task_id=task_id,
+                            task_title=task.title,
+                            task_description=task.description,
+                            buggy_code=failed_code,
+                            test_logs=failed_logs,
+                            diagnosis=diagnosis,
+                            repaired_code=code
+                        )
+                        
+                        if lesson_data:
+                            LessonRepository.create(self.db, lesson_data)
+                            if retrieved_ids:
+                                LessonRepository.increment_success_reuse(self.db, retrieved_ids)
                 
                 self.state = AgentState.SAVING
                 self.db.commit()
