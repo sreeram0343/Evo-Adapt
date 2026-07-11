@@ -124,3 +124,12 @@ class MetricsSummaryResponse(BaseModel):
     total_cost_usd: float
     recode_avg_attempts: float
     experience_reuse_frequency: int
+
+class TraceEventResponse(BaseModel):
+    id: str
+    attemptId: int
+    label: str
+    timestamp: str
+    type: str
+    description: Optional[str] = None
+

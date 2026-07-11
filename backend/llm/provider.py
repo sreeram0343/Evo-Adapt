@@ -64,7 +64,7 @@ class MockProvider(LLMProvider):
                     "        complement = target - num\n"
                     "        if complement in seen:\n"
                     "            return [seen[complement], i]\n"
-                    "            seen[num] = i\n"
+                    "        seen[num] = i\n"
                     "    return []"
                 )
             else:

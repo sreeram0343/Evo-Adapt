@@ -104,5 +104,5 @@ def test_run_experiment_placeholder():
     data = response.json()
     assert data["task_id"] == "t1"
     assert data["mode"] == "recode"
-    assert len(data["attempts"]) == 1
-    assert data["attempts"][0]["generated_code"] == "def placeholder(): pass"
+    assert len(data["attempts"]) == 2
+    assert "def solution" in data["attempts"][0]["generated_code"]
